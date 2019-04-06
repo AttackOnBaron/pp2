@@ -27,9 +27,9 @@ int main()
     gettimeofday(&tv1, &tz);
 	
     #pragma omp parallel for shared(i,j,k) shared(A,B,C) num_threads(4)
-    #pragma omp for schedule(static)
+    //#pragma omp for schedule(static)
     for (i = 0; i < N; ++i) {
-	//#pragma omp for schedule(static)
+	#pragma omp for schedule(static)
     	for (j = 0; j < N; ++j) {
 		//#pragma omp for schedule(static)
             	for (k = 0; k < N; ++k) {
