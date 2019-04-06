@@ -1,79 +1,42 @@
-#include <omp.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
+#include <sys/time.h>
 
-#define NRA 62                 /* number of rows in matrix A */
-#define NCA 15                 /* number of columns in matrix A */
-#define NCB 7                  /* number of columns in matrix B */
 
-int main (int argc, char *argv[]) 
+#define N 1000
+
+int A[N][N];
+int B[N][N];
+int C[N][N];
+
+int main() 
 {
-int	tid, nthreads, i, j, k, chunk;
-double	a[NRA][NCA],           /* matrix A to be multiplied */
-	b[NCA][NCB],           /* matrix B to be multiplied */
-	c[NRA][NCB];           /* result matrix C */
-
-chunk = 10;                    /* set loop iteration chunk size */
-
-/*** Spawn a parallel region explicitly scoping all variables ***/
-	
-#pragma omp parallel default(private) shared (a, b, c, dim) \
-num_threads(4)
-#pragma omp for schedule(static)
-for (i = 0; i < dim; i++) {
-for (j = 0; j < dim; j++) {
-c(i,j) = 0;
-for (k = 0; k < dim; k++) {
- c(i,j) += a(i, k) * b(k, j);
-}
-}
- }
-#pragma omp parallel shared(a,b,c,nthreads,chunk) private(tid,i,j,k)
-  {
-  tid = omp_get_thread_num();
-  if (tid == 0)
-    {
-    nthreads = omp_get_num_threads();
-    printf("Starting matrix multiple example with %d threads\n",nthreads);
-    printf("Initializing matrices...\n");
+    int i,j,k;
+    struct timeval tv1, tv2;
+    struct timezone tz;
+	double elapsed; 
+    omp_set_num_threads(omp_get_num_procs());
+    for (i= 0; i< N; i++)
+        for (j= 0; j< N; j++)
+	{
+            A[i][j] = 2;
+            B[i][j] = 2;
+	}
+    gettimeofday(&tv1, &tz);
+    #pragma omp parallel for private(i,j,k) shared(A,B,C)
+    for (i = 0; i < N; ++i) {
+        for (j = 0; j < N; ++j) {
+            for (k = 0; k < N; ++k) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
     }
-  /*** Initialize matrices ***/
-  #pragma omp for schedule (static, chunk) 
-  for (i=0; i<NRA; i++)
-    for (j=0; j<NCA; j++)
-      a[i][j]= i+j;
-  #pragma omp for schedule (static, chunk)
-  for (i=0; i<NCA; i++)
-    for (j=0; j<NCB; j++)
-      b[i][j]= i*j;
-  #pragma omp for schedule (static, chunk)
-  for (i=0; i<NRA; i++)
-    for (j=0; j<NCB; j++)
-      c[i][j]= 0;
 
-  /*** Do matrix multiply sharing iterations on outer loop ***/
-  /*** Display who does which iterations for demonstration purposes ***/
-  printf("Thread %d starting matrix multiply...\n",tid);
-  #pragma omp for schedule (static, chunk)
-  for (i=0; i<NRA; i++)    
-    {
-    printf("Thread=%d did row=%d\n",tid,i);
-    for(j=0; j<NCB; j++)       
-      for (k=0; k<NCA; k++)
-        c[i][j] += a[i][k] * b[k][j];
-    }
-  }   /*** End of parallel region ***/
 
-/*** Print results ***/
-printf("******************************************************\n");
-printf("Result Matrix:\n");
-for (i=0; i<NRA; i++)
-  {
-  for (j=0; j<NCB; j++) 
-    printf("%6.2f   ", c[i][j]);
-  printf("\n"); 
-  }
-printf("******************************************************\n");
-printf ("Done.\n");
+    gettimeofday(&tv2, &tz);
+    elapsed = (double) (tv2.tv_sec-tv1.tv_sec) + (double) (tv2.tv_usec-tv1.tv_usec) * 1.e-6;
+    printf("elapsed time = %f seconds.\n", elapsed);
 
 }
