@@ -31,7 +31,7 @@ int main()
       	for (i = 0; i < N; ++i) {
 	  //#pragma omp for schedule(static)
     	  for (j = 0; j < N; ++j) {
-	      #pragma omp for schedule(static)
+	      #pragma omp for
               for (k = 0; k < N; ++k) {
                   C[i][j] += A[i][k] * B[k][j];
               }
