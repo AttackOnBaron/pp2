@@ -17,7 +17,9 @@ int main()
     struct timeval tv1, tv2;
     struct timezone tz;
 	double elapsed; 
-    omp_set_num_threads(1);
+	
+    omp_set_num_threads(2);
+	
     for (i= 0; i< N; i++)
         for (j= 0; j< N; j++)
 	{
