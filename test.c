@@ -30,7 +30,7 @@ int main()
  
         //#pragma omp for schedule(static)
     	for (i = 0; i < N; ++i) {
-		#pragma omp for schedule(static)
+		//#pragma omp for schedule(static)
     		for (j = 0; j < N; ++j) {
 			//#pragma omp for schedule(static)
             		for (k = 0; k < N; ++k) {
