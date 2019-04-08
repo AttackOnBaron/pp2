@@ -29,7 +29,7 @@ int main()
     #pragma omp parallel for shared(i,j,k) shared(A,B,C) //num_threads(4)
     //#pragma omp for
     for (i = 0; i < N; ++i) {
-	#pragma omp for
+	//#pragma omp for
     	for (j = 0; j < N; ++j) {
 		//#pragma omp for schedule(static)
             	for (k = 0; k < N; ++k) {
