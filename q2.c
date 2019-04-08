@@ -131,7 +131,7 @@ void gaussianEliminationUsingOpenMp(){
 
 int main(int argc, char **argv) {
 
-    //omp_set_num_threads(2);
+    omp_set_num_threads(2);
     
     struct timeval startTime, endTime;
     struct timezone dummyTimeZone;
