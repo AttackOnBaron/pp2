@@ -17,7 +17,7 @@ int main()
     struct timeval tv1, tv2;
     struct timezone tz;
 	double elapsed; 
-    omp_set_num_threads(omp_get_num_procs());
+    omp_set_num_threads(1);
     for (i= 0; i< N; i++)
         for (j= 0; j< N; j++)
 	{
@@ -26,12 +26,12 @@ int main()
 	}
     gettimeofday(&tv1, &tz);
 	
-    #pragma omp parallel for //private(i,j,k) shared(A,B,C) //num_threads(4)     
+    #pragma omp parallel for //num_threads(4)//private(i,j,k) shared(A,B,C)      
         //#pragma omp for schedule(static)
       	for (i = 0; i < N; ++i) {
-	  //#pragma omp for schedule(static)
+	  #pragma omp for schedule(static)
     	  for (j = 0; j < N; ++j) {
-	      #pragma omp parallel for
+	      #pragma omp parallel for schedule(static)
               for (k = 0; k < N; ++k) {
                   C[i][j] += A[i][k] * B[k][j];
               }
