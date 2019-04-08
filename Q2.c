@@ -96,9 +96,12 @@ void printResult() {
     }
 }
 
-
+/* Gaussian elimination using openMp
+ * Outer loop has data dependency so pragma omp parallelism has been used for 1st inner loop
+ * Later on, back substitution has been used to calculate Result
+ */
 void gaussianEliminationUsingOpenMp(){
-    int threads = omp_get_num_threads(8);
+
     int iterator, row, column;
     float multiplier;
     for (iterator = 0; iterator < MATRIX_SIZE - 1; iterator++) {
@@ -108,7 +111,7 @@ void gaussianEliminationUsingOpenMp(){
 //                printf("Open mp Thread id %d : \n", threadId);
             multiplier = COEFFICIENT[row][iterator] / COEFFICIENT[iterator][iterator];
             for (column = iterator; column < MATRIX_SIZE; column++) {
-//                    int threadCount = threads;
+//                    int threadCount = omp_get_num_threads();
 //                    printf("Number of threads %d : \n", threadCount);
                 COEFFICIENT[row][column] = COEFFICIENT[row][column] - COEFFICIENT[iterator][column] * multiplier;
             }
@@ -128,6 +131,8 @@ void gaussianEliminationUsingOpenMp(){
 
 int main(int argc, char **argv) {
 
+    omp_set_num_threads(2);
+    
     struct timeval startTime, endTime;
     struct timezone dummyTimeZone;
     unsigned long long executionStartTime, executionEndTime;
